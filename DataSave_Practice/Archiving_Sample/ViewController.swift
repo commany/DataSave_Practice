@@ -56,12 +56,15 @@ class ViewController: UIViewController {
 		
 		
 		// File 작업
-		createFile()
+		//createFile()
+		
 		//fileMgr()
 		
+		// FileHandle 작업
+		fileHandle()
 		
 		
-		saveButton.addTarget(self, action: #selector(self.saveButtonTapped(sender:)), for: .touchUpInside)
+		// / saveButton.addTarget(self, action: #selector(self.saveButtonTapped(sender:)), for: .touchUpInside)
 	}
 	
 	@objc func saveButtonTapped(sender: UIButton) {
@@ -345,6 +348,7 @@ class ViewController: UIViewController {
 		print("========================================================")
 	}
 	
+	// 파일 관련 작업만 모아놓은 함수
 	func createFile() {
 		
 		let fileManager = FileManager.default
@@ -381,26 +385,83 @@ class ViewController: UIViewController {
 		}
 		
 		// [3] 파일 생성
-		let filePath1 = newDirCreate.appendingPathComponent("testfile1.txt")
-		if fileManager.createFile(atPath: filePath1.path, contents: nil, attributes: nil) {
+		// 파일 이름을 기존의 경로에 추가
+		let filePath1 = tmpPath.appendingPathComponent("testfile1.txt")
+		if fileManager.createFile(atPath: filePath1.path, contents: nil,
+								  attributes: nil) {
 			print ("[3-Create File] \"testfile1.txt\" 파일을 생성되었습니다.")
 			
-			let writingText = "some text"
+			// 파일에 쓸 내용
+			let writingText = "Hello File From Swift\nHi~~~"
 			do {
-				try writingText.write(toFile: filePath1.path, atomically: true, encoding: .utf8)
+				// 쓰기 작업
+				try writingText.write(toFile: filePath1.path, atomically: true,
+									  encoding: .utf8)
 			} catch {
-				print("[3-Writing] 해당 file에 내용이 쓰기되지 않았습니다.")
+				print("[3-Writing] Error Writing File : \(error.localizedDescription)")
 			}
 		} else {
 			print ("[3-Create File] 파일을 생성할 수 없습니다.")
 		}
 		
+		do {
+			// 파일 속 내용 읽기
+			let fileContent = try String(contentsOfFile: filePath1.path, encoding: String.Encoding.utf8)
+			print("[3-Reading] \(fileContent)")
+		} catch let error {
+			print("[3-Reading] Error Reading File : \(error.localizedDescription)")
+		}
+		
+		
+		
 		let filePath2 = newDirCreate.appendingPathComponent("testfile2.txt")
-		if fileManager.createFile(atPath: filePath2.path, contents: nil, attributes: nil) {
+		if fileManager.createFile(atPath: filePath2.path, contents: nil,
+								  attributes: nil) {
 			print ("[3-Create File] \"testfile2.txt\" 파일을 생성되었습니다.")
 		} else {
 			print ("[3-Create File] 파일을 생성할 수 없습니다.")
 		}
+		
+		// 파일 옮기기
+		let moveFilePath = newDirCreate.appendingPathComponent("testfile1.txt")
+		
+		/*
+		do {
+			print("\(fileManager.currentDirectoryPath)")
+			try fileManager.moveItem(atPath: filePath1.path, toPath: moveFilePath.path)
+			print("[F4] 파일을 성공적으로 옮겼습니다.")
+		} catch let error {
+			print("[F4] 파일을 옮기지 못 했습니다. \n -> \(error.localizedDescription)")
+		}
+		*/
+		
+		do {
+			try fileManager.copyItem(at: filePath1, to: moveFilePath)
+			print("[F4] 파일을 성공적으로 복사했습니다..")
+		} catch let error {
+			print("[F4] 파일을 복사하지 못 했습니다. \n -> \(error.localizedDescription)")
+		}
+		
+		// 파일 삭제
+		if fileManager.fileExists(atPath: moveFilePath.path) {
+			do {
+				try fileManager.removeItem(at: moveFilePath)
+				print("[5] 기존 파일 삭제 성공!!")
+			} catch let error {
+				print("[5] 기존 파일 삭제 실패!!/nError : \(error.localizedDescription)")
+			}
+		} else {
+			print("[5] 해당 파일 존재하지 않음!!")
+		}
+		
+		do {
+			try fileManager.createSymbolicLink(at: filePath2, withDestinationURL: moveFilePath)
+			print("[6] Link successful!!")
+		} catch {
+			print("[6] Link failed!! Error => \(error)")
+		}
+		
+		
 		
 		/*
 		let file = "nameOfFile.txt" // use .html instead of .txt to create html files
@@ -422,6 +483,63 @@ class ViewController: UIViewController {
 			}
 		}
 		*/
+	}
+	
+	// 파일 핸들을 사용한 작업 만 모아놓은 함수
+	func fileHandle() {
+		
+		// FileHandle 객체 생성
+		let filePath1 = FileManager.default.temporaryDirectory.appendingPathComponent("testfile1.txt")
+		print("Tem Dir : \(filePath1)")
+		let fileHandle: FileHandle? = FileHandle(forReadingAtPath: filePath1.path)
+		
+		if fileHandle == nil {
+			print("File open failed")
+		} else {
+			// File Offset and Seeking
+			/*
+			print("[7] Offset = \(String(describing: file?.offsetInFile))")
+			file?.seekToEndOfFile()
+			print("[7] Offset = \(String(describing: file?.offsetInFile))")
+			file?.seek(toFileOffset: 30)
+			print("[7] Offset = \(String(describing: file?.offsetInFile))")
+			*/
+			
+			// Writing Data to File
+			// let dataString = "The quick brown fox jumped over the lazy dog"
+			// fileHandle?.write(dataString.data(using: .utf8)!)
+			
+			if fileHandle != nil {
+				// Read data from the file
+				//let data = fileHandle?.readDataToEndOfFile()
+				let data = fileHandle?.readData(ofLength: 27)
+				
+				// data to string conversion
+				let text = String(data: data!, encoding: String.Encoding.utf8) as String!
+				print(text ?? "")
+				
+				// Close the file
+				// fileHandle?.closeFile()
+			} else {
+				print("Ooops! Something went wrong!!")
+			}
+		}
+		
+		if fileHandle != nil {
+			
+			// You can make the data
+			let data = ("Some Text to write" as String).data(using: String.Encoding.utf8)
+			
+			// Write it to the file
+			fileHandle?.seekToEndOfFile()
+			fileHandle?.write(data!)
+		}
+		else {
+			print("Ooops! Something went wrong!")
+		}
+		
+		// Close the file
+		fileHandle?.closeFile()
 	}
 }
 
