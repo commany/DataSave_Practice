@@ -491,7 +491,7 @@ class ViewController: UIViewController {
 		// FileHandle 객체 생성
 		let filePath1 = FileManager.default.temporaryDirectory.appendingPathComponent("testfile1.txt")
 		print("Tem Dir : \(filePath1)")
-		let fileHandle: FileHandle? = FileHandle(forReadingAtPath: filePath1.path)
+		var fileHandle: FileHandle? = FileHandle(forReadingAtPath: filePath1.path)
 		
 		if fileHandle == nil {
 			print("File open failed")
@@ -511,35 +511,64 @@ class ViewController: UIViewController {
 			
 			if fileHandle != nil {
 				// Read data from the file
-				//let data = fileHandle?.readDataToEndOfFile()
-				let data = fileHandle?.readData(ofLength: 27)
+				let data = fileHandle?.readDataToEndOfFile()
+				// let data = fileHandle?.readData(ofLength: 27)
 				
 				// data to string conversion
 				let text = String(data: data!, encoding: String.Encoding.utf8) as String!
 				print(text ?? "")
 				
 				// Close the file
-				// fileHandle?.closeFile()
+				fileHandle?.closeFile()
 			} else {
 				print("Ooops! Something went wrong!!")
 			}
 		}
 		
-		if fileHandle != nil {
-			
+		
+		var fileHandleTemp: FileHandle? = FileHandle(forUpdatingAtPath: filePath1.path)
+		// var fileHandleTemp: FileHandle? = FileHandle(forWritingAtPath: filePath1.path)
+		
+		if fileHandleTemp != nil {
 			// You can make the data
-			let data = ("Some Text to write" as String).data(using: String.Encoding.utf8)
+			let data = ("\nSome Text to write" as String).data(using: String.Encoding.utf8)
 			
 			// Write it to the file
-			fileHandle?.seekToEndOfFile()
-			fileHandle?.write(data!)
+			fileHandleTemp?.seekToEndOfFile()
+			fileHandleTemp?.write(data!)
+			
+			// Close the file
+			fileHandleTemp?.closeFile()
 		}
 		else {
 			print("Ooops! Something went wrong!")
 		}
 		
-		// Close the file
-		fileHandle?.closeFile()
+		
+		// Truncating a File
+		fileHandleTemp = FileHandle(forUpdatingAtPath: filePath1.path)
+		if fileHandleTemp == nil {
+			print("File open failed")
+		} else {
+			fileHandleTemp?.truncateFile(atOffset: 27)
+			fileHandleTemp?.closeFile()
+			
+			// Read data from the file
+			fileHandle = FileHandle(forReadingAtPath: filePath1.path)
+			let data = fileHandle?.readDataToEndOfFile()
+			
+			// data to string conversion
+			let text = String(data: data!, encoding: String.Encoding.utf8) as String!
+			print(text ?? "")
+		}
+		
+		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory,
+														   .userDomainMask,
+														   true)
+		let docsDir = dirPaths[0]
+		let dataFile = docsDir.appending(("savefile.txt"))
+		print("[1] DataFile PATH - \(dataFile)")
+
 	}
 }
 
