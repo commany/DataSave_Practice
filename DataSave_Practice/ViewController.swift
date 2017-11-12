@@ -10,69 +10,11 @@ import UIKit
 import Foundation
 
 class ViewController: UIViewController {
-
-	@IBOutlet weak var nameTextField: UITextField!
-	@IBOutlet weak var addressTextField: UITextField!
-	@IBOutlet weak var phoneTextField: UITextField!
-	
-	@IBOutlet weak var saveButton: UIButton!
-
-	var dataFilePath: String!
-	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		
-		
-		/*
-		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-		let documentDirectory = dirPaths[0]
-		let folder = documentDirectory.appending("/templates")
-		
-		var fileListArray: [String]
-		
-		do
-		{
-			let fileList = try FileManager.default.contentsOfDirectory(atPath: folder)
-			for file in fileList
-			{
-				fileListArray.append(file)
-			}
-		}
-		catch
-		{
-			debugPrint(error.localizedDescription)
-		}
-		*/
-		
-	
-		/*
-		// 애플리케이션의 Document 디렉토리 경로를 추출, 이 경로와 아카이브 데이터 파일 이름을 가지고 전체 경로를 만든후 dataFilePath를 생성
-		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-		let docsDir = dirPaths[0] as String
-		//dataFilePath = docsDir.stringByAppendingString("/data.archive")
-		print("[1] DataFilePath => \(dataFilePath)")
-		*/
-		
-		
-		// File 작업
-		//createFile()
-		
-		//fileMgr()
-		
-		// FileHandle 작업
-		fileHandle()
-		
-		
-		// / saveButton.addTarget(self, action: #selector(self.saveButtonTapped(sender:)), for: .touchUpInside)
 	}
-	
-	@objc func saveButtonTapped(sender: UIButton) {
-		// 호출시 새로운 배열을 만들고 필드의 내용을 배열의 각 항목에 할당한다.
-		let contactArray = [nameTextField.text!, addressTextField.text!, phoneTextField.text!]
-		NSKeyedArchiver.archiveRootObject(contactArray, toFile: dataFilePath!)
-		print("[3] Archiving 저장이 완료되었습니다.")
-	}
+
 	
 	// 현재 애플리케이션의 Documents 디렉토리 얻기
 	func getDocumentsDirectory() -> URL {
