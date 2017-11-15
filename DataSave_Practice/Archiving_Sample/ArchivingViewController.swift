@@ -57,13 +57,13 @@ class ArchivingViewController: UIViewController {
         super.viewDidLoad()
 
 		let fileManager = FileManager.default
-		
+
 		// 애플리케이션의 Document 디렉토리 경로를 추출, 이 경로와 아카이브 데이터 파일 이름을 가지고 전체 경로를 만든후 dataFilePath를 생성
 		let dirPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
 		let docsDir = dirPaths[0]
 		self.dataFilePath = docsDir.appending("/data.archive")
 		print("[1] DataFilePath => \(self.dataFilePath!)")
-		
+
 		guard fileManager.fileExists(atPath: self.dataFilePath!) else {
 			// 파일 생성
 			if fileManager.createFile(atPath: self.dataFilePath!, contents: nil, attributes: nil) {
